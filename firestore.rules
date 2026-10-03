@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // allow public access for demonstration/initial setup
+    // RECOMMENDATION: Enable Anonymous Auth in Firebase Console and change 'true' to 'request.auth != null'
+    match /{document=**} {
+      allow read, write: if true;
+    }
+
+    // Explicitly defining collection rules for clarity
+    match /students/{id} { allow read, write: if true; }
+    match /admissions/{id} { allow read, write: if true; }
+    match /portal_messages/{id} { allow read, write: if true; }
+    match /marks/{id} { allow read, write: if true; }
+    match /settings/{id} { allow read, write: if true; }
+    match /inventory/{id} { allow read, write: if true; }
+    match /library/{id} { allow read, write: if true; }
+    match /calendar/{id} { allow read, write: if true; }
+    match /transactions/{id} { allow read, write: if true; }
+    match /school_config/{id} { allow read, write: if true; }
+    match /app_ratings/{id} { allow read, write: if true; }
+  }
+}

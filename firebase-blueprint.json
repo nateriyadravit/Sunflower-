@@ -1,0 +1,114 @@
+{
+  "entities": {
+    "Student": {
+      "title": "Student",
+      "description": "Student record in the directory",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "roll": { "type": "string" },
+        "class": { "type": "string" },
+        "mobile": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "roll"]
+    },
+    "FeeSettings": {
+      "title": "Fee Settings",
+      "description": "Global fee tracking data",
+      "type": "object",
+      "properties": {
+        "totalCollection": { "type": "string" }
+      }
+    },
+    "MarkRecord": {
+      "title": "Mark Record",
+      "description": "Academic performance for a student",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "class": { "type": "string" },
+        "roll": { "type": "string" },
+        "marks": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      }
+    },
+    "Admission": {
+      "title": "Admission",
+      "description": "New admission application",
+      "type": "object",
+      "properties": {
+        "studentName": { "type": "string" },
+        "dob": { "type": "string" },
+        "class": { "type": "string" },
+        "mobile": { "type": "string" },
+        "address": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Approved", "Rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "PortalMessage": {
+      "title": "Portal Message",
+      "description": "Secure message in the portal",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "role": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SchoolConfig": {
+      "title": "School Config",
+      "description": "Institution contact and global details",
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string" },
+        "email": { "type": "string" }
+      }
+    },
+    "AppRating": {
+      "title": "App Rating",
+      "description": "User ratings for the application",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userRole": { "type": "string" },
+        "rating": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Student directory"
+    },
+    "/settings/fees": {
+      "schema": "FeeSettings",
+      "description": "Fee tracking"
+    },
+    "/marks/{studentRollId}": {
+      "schema": "MarkRecord",
+      "description": "Academic results"
+    },
+    "/admissions/{applicationId}": {
+      "schema": "Admission",
+      "description": "Admission applications"
+    },
+    "/portal_messages/{messageId}": {
+      "schema": "PortalMessage",
+      "description": "Portal messages"
+    },
+    "/school_config/contact": {
+      "schema": "SchoolConfig",
+      "description": "Institutional contact information"
+    },
+    "/app_ratings/{ratingId}": {
+      "schema": "AppRating",
+      "description": "User feedback ratings"
+    }
+  }
+}
