@@ -33,7 +33,18 @@
         "marks": {
           "type": "array",
           "items": { "type": "object" }
-        }
+        },
+        "previousMarks": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "examHistory": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "teacherRemarks": { "type": "string" },
+        "promotionStatus": { "type": "string" },
+        "attendance": { "type": "string" }
       }
     },
     "Admission": {
@@ -79,6 +90,17 @@
         "rating": { "type": "number" },
         "timestamp": { "type": "string", "format": "date-time" }
       }
+    },
+    "DirectorNotice": {
+      "title": "Director Notice",
+      "description": "Official communication and guidelines issued by the School Director",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "author": { "type": "string" },
+        "date": { "type": "string" }
+      }
     }
   },
   "firestore": {
@@ -105,6 +127,10 @@
     "/school_config/contact": {
       "schema": "SchoolConfig",
       "description": "Institutional contact information"
+    },
+    "/school_config/director_notice": {
+      "schema": "DirectorNotice",
+      "description": "Official director notice and administrative directives"
     },
     "/app_ratings/{ratingId}": {
       "schema": "AppRating",

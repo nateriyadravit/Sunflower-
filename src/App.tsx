@@ -23,7 +23,8 @@ import {
   Mail,
   Save,
   Star,
-  Share2
+  Share2,
+  FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './lib/utils';
@@ -79,6 +80,14 @@ export default function App() {
   const [schoolContact, setSchoolContact] = useState({ phone: '', email: '' });
   const [isSavingContact, setIsSavingContact] = useState(false);
   const [userRating, setUserRating] = useState<number | null>(null);
+  const [directorNotice, setDirectorNotice] = useState({
+    title: 'Official Academic Directives & Notice',
+    content: 'Sunflower Public School maintains the highest standard of academic excellence and holistic development. All students are advised to review their marksheet progress curves regularly. Consistency, discipline, and participation in both scholastic and co-scholastic activities are mandatory.',
+    author: 'Director, Sunflower Public School',
+    date: 'Session 2026'
+  });
+  const [isEditingDirectorNotice, setIsEditingDirectorNotice] = useState(false);
+  const [isSavingDirectorNotice, setIsSavingDirectorNotice] = useState(false);
 
   useEffect(() => {
     const fetchSchoolContact = async () => {
@@ -92,8 +101,34 @@ export default function App() {
         console.error("Error fetching school contact:", error);
       }
     };
+    const fetchDirectorNotice = async () => {
+      try {
+        const docRef = doc(db, 'school_config', 'director_notice');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setDirectorNotice(docSnap.data() as any);
+        }
+      } catch (error) {
+        console.error("Error fetching director notice:", error);
+      }
+    };
     fetchSchoolContact();
+    fetchDirectorNotice();
   }, []);
+
+  const handleSaveDirectorNotice = async () => {
+    if (!['principal', 'director'].includes(userRole as string)) return;
+    setIsSavingDirectorNotice(true);
+    try {
+      await setDoc(doc(db, 'school_config', 'director_notice'), directorNotice);
+      toast.success('Director notice updated successfully');
+      setIsEditingDirectorNotice(false);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, 'school_config/director_notice');
+    } finally {
+      setIsSavingDirectorNotice(false);
+    }
+  };
 
   useEffect(() => {
     if (!userRole) return;
@@ -893,6 +928,126 @@ export default function App() {
                                 <p className="text-[10px] font-medium opacity-60 mt-1">Last Update: May 2026 • Secure Cloud Integration</p>
                               </div>
                             </div>
+                          </div>
+                        </div>
+
+                        {/* Director Notice Section - Placed between Language/Preferences and Institution Contact Details */}
+                        <div className="mt-8 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                                <FileText size={16} />
+                              </div>
+                              <div>
+                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">
+                                  Director's Notice / निदेशक सूचना (Director Desk)
+                                </h3>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                  Official Circulars & Guidelines for School Administration
+                                </p>
+                              </div>
+                            </div>
+                            {['principal', 'director'].includes(userRole as string) && (
+                              <button
+                                onClick={() => {
+                                  if (isEditingDirectorNotice) {
+                                    handleSaveDirectorNotice();
+                                  } else {
+                                    setIsEditingDirectorNotice(true);
+                                  }
+                                }}
+                                className={cn(
+                                  "px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5",
+                                  isEditingDirectorNotice 
+                                    ? "bg-green-500 hover:bg-green-600 text-white" 
+                                    : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                )}
+                              >
+                                {isEditingDirectorNotice ? <Save size={14} /> : <FileText size={14} />}
+                                {isEditingDirectorNotice ? (isSavingDirectorNotice ? 'Saving...' : 'Save Notice') : 'Edit Notice'}
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="p-6 bg-gradient-to-br from-amber-500/5 via-slate-50 to-slate-50 dark:from-amber-500/10 dark:via-slate-800/40 dark:to-slate-800/40 rounded-3xl border border-amber-500/20 dark:border-amber-500/30 shadow-xs text-left relative overflow-hidden">
+                            <div className="absolute right-0 top-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+                            
+                            <div className="flex items-center justify-between mb-3 border-b border-amber-500/10 pb-3">
+                              <div className="flex items-center gap-2">
+                                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider">
+                                  Director Notice
+                                </span>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                  {directorNotice.date || 'Active Session 2026'}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-mono font-bold text-slate-400">REF: SPS/DIR/2026</span>
+                            </div>
+
+                            {isEditingDirectorNotice ? (
+                              <div className="space-y-4">
+                                <div>
+                                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Notice Title / विषय</label>
+                                  <input 
+                                    type="text"
+                                    value={directorNotice.title}
+                                    onChange={(e) => setDirectorNotice({ ...directorNotice, title: e.target.value })}
+                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-yellow-400"
+                                    placeholder="Notice Title..."
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Notice Content / मुख्य संदेश</label>
+                                  <textarea 
+                                    rows={4}
+                                    value={directorNotice.content}
+                                    onChange={(e) => setDirectorNotice({ ...directorNotice, content: e.target.value })}
+                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-yellow-400"
+                                    placeholder="Enter circular or notice details here..."
+                                  />
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Director Name / Signatory</label>
+                                    <input 
+                                      type="text"
+                                      value={directorNotice.author}
+                                      onChange={(e) => setDirectorNotice({ ...directorNotice, author: e.target.value })}
+                                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-1">Date / Academic Term</label>
+                                    <input 
+                                      type="text"
+                                      value={directorNotice.date}
+                                      onChange={(e) => setDirectorNotice({ ...directorNotice, date: e.target.value })}
+                                      className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white outline-none"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                                  {directorNotice.title}
+                                </h4>
+                                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+                                  {directorNotice.content}
+                                </p>
+                                <div className="pt-3 border-t border-amber-500/10 flex items-center justify-between text-xs">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-6 h-6 rounded-full bg-amber-400/30 flex items-center justify-center text-amber-700 dark:text-amber-300 font-black text-[10px]">
+                                      DIR
+                                    </div>
+                                    <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+                                      {directorNotice.author}
+                                    </span>
+                                  </div>
+                                  <span className="italic text-[10px] text-slate-400">Sunflower Public School Central Directorate</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
 
